@@ -32,7 +32,7 @@ public class ImageFinder extends HttpServlet {
 		String url = req.getParameter("url");
 		if (url != null && !url.isEmpty()) {
 			try {
-				imageScrapper = new ImageScrapper(url,1);
+				imageScrapper = new ImageScrapper(url,0);
 			} catch (Exception e) {
 				System.out.println("Error");
 			}

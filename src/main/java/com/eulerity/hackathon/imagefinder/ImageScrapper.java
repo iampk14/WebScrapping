@@ -7,18 +7,26 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ImageScrapper {
+public class ImageScrapper implements Runnable {
     private String URL;
     private static List<String> imageUrls = new ArrayList<>();
     private static Set<String> visitedUrls = new HashSet<>();
-    private static final int MAX_DEPTH = 2;
-    private static final int MAX_LINKS = 5;
+    private static final int MAX_DEPTH = 3;
+    private static final int MAX_LINKS = 10;
     private int validLinkCount = 0;
+    private String domain;
+
+    @Override
+    public void run() {
+
+    }
 
     public ImageScrapper(String URL, int depth) {
         this.URL = URL;
@@ -44,6 +52,7 @@ public class ImageScrapper {
                     .get();
 
             // Extract all image elements
+            domain = getDomainName(URL);
             getImages(doc);
 
             // Find links to other pages and recursively scrape them
@@ -54,7 +63,7 @@ public class ImageScrapper {
                         break;
                     }
                     String nextUrl = link.absUrl("href");
-                    if (!nextUrl.isEmpty() && !visitedUrls.contains(nextUrl)) {
+                    if (!nextUrl.isEmpty() && !visitedUrls.contains(nextUrl) && domain.equals(getDomainName(nextUrl)) ){
                         validLinkCount++;
                         scrapeImages(nextUrl, depth + 1);
                     }
@@ -73,19 +82,25 @@ public class ImageScrapper {
         }
     }
 
-    private void getImages(Document doc) {
+    private void getImages(Document doc) throws URISyntaxException {
         Elements images = doc.select("img");
         // Iterate over the image elements and extract src attribute
         for (Element image : images) {
             String imageUrl = image.absUrl("src");
-            if (!imageUrl.isEmpty() && !imageUrls.contains(imageUrl)) {
+            if (!imageUrl.isEmpty() && !imageUrls.contains(imageUrl) && domain.equals(getDomainName(imageUrl))) {
                 imageUrls.add(imageUrl);
             }
         }
     }
 
+    private static String getDomainName(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String domain = uri.getHost();
+        return domain.startsWith("www.") ? domain.substring(4) : domain;
+    }
+
     public List<String> getData() {
-        // for(String s :imageUrls){
+        // for (String s : imageUrls) {
         //     System.out.println(s);
         // }
         return imageUrls;
@@ -97,4 +112,5 @@ public class ImageScrapper {
         validLinkCount = 0;
         return true;
     }
+
 }
