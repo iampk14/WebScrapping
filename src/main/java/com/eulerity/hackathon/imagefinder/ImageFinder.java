@@ -37,7 +37,7 @@ public class ImageFinder extends HttpServlet{
 		try{ 
 			imageScrapper = new ImageScrapper(url);
 		}catch (Exception e){
-			System.out.println("Tatti");
+			System.out.println("Error");
 		}
 		System.out.println("Got request of:" + path + " with query param:" + url);
 		System.out.println(imageScrapper.getData());
