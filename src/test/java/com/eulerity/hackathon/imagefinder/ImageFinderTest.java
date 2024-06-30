@@ -15,8 +15,6 @@ import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
 import org.mockito.Mockito;
-
-import com.eulerity.hackathon.imagefinder.ImageFinder;
 import com.google.gson.Gson;
 
 public class ImageFinderTest {

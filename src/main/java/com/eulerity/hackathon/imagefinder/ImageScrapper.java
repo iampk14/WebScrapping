@@ -10,29 +10,39 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ImageScrapper implements Runnable {
     private String URL;
-    private static List<String> imageUrls = new ArrayList<>();
-    private static Set<String> visitedUrls = new HashSet<>();
-    private static final int MAX_DEPTH = 3;
-    private static final int MAX_LINKS = 10;
-    private int validLinkCount = 0;
+    private static List<String> imageUrls = Collections.synchronizedList(new ArrayList<>());
+    private static Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
+    private static final int MAX_DEPTH = 5;
+    private static final int MAX_LINKS = 20;
+    private static volatile int validLinkCount = 0;
     private String domain;
+    private int depth;
+    private Thread thread;
 
     @Override
     public void run() {
-
+        scrapeImages(URL, depth);
     }
 
     public ImageScrapper(String URL, int depth) {
         this.URL = URL;
+        this.depth = depth;
+        this.domain = getDomainName(URL);
         if (depth <= MAX_DEPTH) {
-            scrapeImages(URL, depth);
+            this.thread = new Thread(this);
+            this.thread.start();
         }
+    }
+
+    public Thread getThread() {
+        return this.thread;
     }
 
     private void scrapeImages(String URL, int depth) {
@@ -52,21 +62,29 @@ public class ImageScrapper implements Runnable {
                     .get();
 
             // Extract all image elements
-            domain = getDomainName(URL);
             getImages(doc);
 
             // Find links to other pages and recursively scrape them
             if (depth < MAX_DEPTH && validLinkCount < MAX_LINKS) {
                 Elements links = doc.select("a[href]");
+                List<Thread> threads = new ArrayList<>();
                 for (Element link : links) {
                     if (validLinkCount >= MAX_LINKS) {
                         break;
                     }
                     String nextUrl = link.absUrl("href");
-                    if (!nextUrl.isEmpty() && !visitedUrls.contains(nextUrl) && domain.equals(getDomainName(nextUrl)) ){
-                        validLinkCount++;
-                        scrapeImages(nextUrl, depth + 1);
+                    if (!nextUrl.isEmpty() && !visitedUrls.contains(nextUrl) && domain.equals(getDomainName(nextUrl))) {
+                        synchronized (this) {
+                            validLinkCount++;
+                        }
+                        Thread thread = new Thread(new ImageScrapper(nextUrl, depth + 1));
+                        threads.add(thread);
+                        thread.start();
                     }
+                }
+                // Wait for all threads to complete
+                for (Thread thread : threads) {
+                    thread.join();
                 }
             }
 
@@ -82,7 +100,7 @@ public class ImageScrapper implements Runnable {
         }
     }
 
-    private void getImages(Document doc) throws URISyntaxException {
+    private void getImages(Document doc) {
         Elements images = doc.select("img");
         // Iterate over the image elements and extract src attribute
         for (Element image : images) {
@@ -93,24 +111,24 @@ public class ImageScrapper implements Runnable {
         }
     }
 
-    private static String getDomainName(String url) throws URISyntaxException {
-        URI uri = new URI(url);
-        String domain = uri.getHost();
-        return domain.startsWith("www.") ? domain.substring(4) : domain;
+    private static String getDomainName(String url) {
+        try {
+            URI uri = new URI(url);
+            String domain = uri.getHost();
+            return domain != null && domain.startsWith("www.") ? domain.substring(4) : domain;
+        } catch (URISyntaxException e) {
+            return "";
+        }
     }
 
-    public List<String> getData() {
-        // for (String s : imageUrls) {
-        //     System.out.println(s);
-        // }
-        return imageUrls;
+    public static List<String> getData() {
+        return new ArrayList<>(imageUrls);
     }
 
-    public boolean reset() {
+    public static boolean reset() {
         imageUrls.clear();
         visitedUrls.clear();
         validLinkCount = 0;
         return true;
     }
-
 }
