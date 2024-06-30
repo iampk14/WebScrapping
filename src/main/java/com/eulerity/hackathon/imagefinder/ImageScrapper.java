@@ -19,8 +19,8 @@ public class ImageScrapper implements Runnable {
     private String URL;
     private static List<String> imageUrls = Collections.synchronizedList(new ArrayList<>());
     private static Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
-    private static final int MAX_DEPTH = 5;
-    private static final int MAX_LINKS = 20;
+    private static final int MAX_DEPTH = 2;
+    private static final int MAX_LINKS = 50;
     private static volatile int validLinkCount = 0;
     private String domain;
     private int depth;
@@ -57,7 +57,7 @@ public class ImageScrapper implements Runnable {
                     .ignoreContentType(true)
                     .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
                     .referrer("http://www.google.com")
-                    .timeout(12000)
+                    .timeout(50000)
                     .followRedirects(true)
                     .get();
 
@@ -73,7 +73,7 @@ public class ImageScrapper implements Runnable {
                         break;
                     }
                     String nextUrl = link.absUrl("href");
-                    if (!nextUrl.isEmpty() && !visitedUrls.contains(nextUrl) && domain.equals(getDomainName(nextUrl))) {
+                    if (isValidUrl(nextUrl) && !visitedUrls.contains(nextUrl) && domain.equals(getDomainName(nextUrl))) {
                         synchronized (this) {
                             validLinkCount++;
                         }
@@ -105,9 +105,19 @@ public class ImageScrapper implements Runnable {
         // Iterate over the image elements and extract src attribute
         for (Element image : images) {
             String imageUrl = image.absUrl("src");
-            if (!imageUrl.isEmpty() && !imageUrls.contains(imageUrl) && domain.equals(getDomainName(imageUrl))) {
+            if (isValidUrl(imageUrl) && !imageUrls.contains(imageUrl) && domain.equals(getDomainName(imageUrl))) {
                 imageUrls.add(imageUrl);
             }
+        }
+    }
+
+    private boolean isValidUrl(String url) {
+        try {
+            URI uri = new URI(url);
+            String host = uri.getHost();
+            return host != null && (host.endsWith(".com") || host.endsWith(".org") || host.endsWith(".in"));
+        } catch (URISyntaxException e) {
+            return false;
         }
     }
 

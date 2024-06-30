@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Instructions - Eulerity Take-Home Challenge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="instructions.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="./Images/Eulerity-Logo.png" alt="Eulerity Logo" class="logo">
+        </div>
+        <ul class="navbar-links">
+            <li><a href="index.html">Back to Main Page</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <h1>Eulerity Take-Home Challenge Instructions</h1>
+
+        <section>
+            <h2>How it works</h2>
+            <ul>
+                <li>Pressing the submit button on the main page will make a POST request to /main</li>
+                <li>That request will contain a form parameter with the URL populated in the input box</li>
+                <li>The ImageFinder servlet will respond to the request with a list of image URLs</li>
+                <li>The main page contains JavaScript to send the request and use the response to build a list of images</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Backend Developers</h2>
+            <ul>
+                <li>You can update the ImageFinder servlet to add crawling logic</li>
+                <li>Feel free to add as many classes/packages/files/third party libraries as you'd like</li>
+                <li>We recommend JSoup for parsing web pages</li>
+                <li>You can update the main page's HTML/CSS/style if you plan on improving the interface</li>
+                <li>Your final submission does not need to contain any of the files included herein</li>
+                <li>This project is just skeleton code so you can hit the ground running.</li>
+            </ul>
+        </section>
+
+        <section class="idea-list">
+            <h3>Some ideas:</h3>
+            <ul>
+                <li>Crawl not only the given URL, but other pages in the same domain</li>
+                <li>Make your crawler multithreaded to speed up response times</li>
+                <li>Be a friendly crawler and try not to hammer a site</li>
+                <li>Think about how to identify different classes of images and do they need special handling</li>
+                <li>Can you identify images as logos? Perhaps collect favicons?</li>
+                <li>Can you mark images that contain people?</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Important Notes</h2>
+            <p>Congratulations on making it this far into the interview process!</p>
+            <p>This is a free-form hackathon for a very important reason. We wish to see what ideas you can bring to the table.</p>
+            <div class="highlight">
+                <p><strong>If your submission only contains 5-10 lines of new code, please think twice about submitting it.</strong> If you need more time, you can ask for it.</p>
+            </div>
+            <p>You can use one of the ideas above, but feel free to go off and build something completely different. The important thing is to submit something that highlights your strengths as a developer.</p>
+            <p><strong>Remember, this is your chance to show off how you can best contribute to our team.</strong></p>
+            <p>Please remember to think about good design and code style. Comments in your code are great, but thought should also be taken in how to name your variables and methods.</p>
+        </section>
+
+        <a href="index.html" class="back-link">Back to Main Page</a>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <span>Prasad Kulkarni</span>
+            <a href="https://www.linkedin.com/in/prasadkulkarni2714/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/iampk14" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+            <span>pkulkarni@binghamton.edu</span>
+            <span>+1 (607) 296 8843</span>
+        </div>
+    </footer>
+</body>
+</html>

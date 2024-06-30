@@ -31,6 +31,7 @@ public class ImageFinder extends HttpServlet {
         
         if (url != null && !url.isEmpty()) {
             try {
+				
                 // Instantiate a new ImageScrapper for each request
                 ImageScrapper imageScrapper = new ImageScrapper(url, 0);
 
