@@ -34,7 +34,7 @@ public class ImageScrapper implements Runnable {
     
     // Constants to limit crawling depth and number of links
     private static final int MAX_DEPTH = 2;
-    private static final int MAX_LINKS = 100;
+    private static final int MAX_LINKS = 50;
     
     // Counter for valid links processed
     private static volatile int validLinkCount = 0;

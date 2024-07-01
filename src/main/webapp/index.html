@@ -21,10 +21,12 @@
         <div class="main-background">
             <main>
                 <h1>Web Scrapper</h1>
+                <p>Use format https://www.example.com/</p>
                 <div class="input-container">
                     <input type="text" name="url" placeholder="Enter URL">
                     <button type="button">Submit</button>
                 </div>
+                <p id="error-message" style="color: red; display: none;">Please use a valid URL</p>
                 <ul class="results"></ul>
             </main>
         </div>
@@ -38,6 +40,10 @@
             <span>+1 (607) 296 8843</span>
         </div>
     </footer>
+    <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Scraping in progress...</p>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

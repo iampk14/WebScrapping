@@ -10,6 +10,50 @@
     padding: 3rem;
 }
 
+p {
+    text-align: center;
+    width: 100%; /* Ensure the paragraph takes full width of its container */
+    margin: 0 auto; /* Center the paragraph horizontally */
+}
+
+/* Add specific styling for the "Use format" paragraph */
+main > p:first-of-type {
+    margin-bottom: 1rem; /* Add some space below the "Use format" text */
+}
+
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading p {
+    color: white;
+    margin-top: 10px;
+}
+
 main {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 2rem;
@@ -17,12 +61,16 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-width: 800px;
     width: 90%;
+    display: flex; /* Add this */
+    flex-direction: column; /* Add this */
+    align-items: center; /* Add this */
 }
 
 .input-container {
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
+    width: 100%; /* Ensure full width */
 }
 
 input[type="text"] {
@@ -49,20 +97,21 @@ button:hover {
 }
 
 .results {
-    
+    display: flex; /* Add this */
+    flex-wrap: wrap; /* Add this */
     justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
     padding: 0;
     list-style-type: none;
+    width: 100%; /* Ensure full width */
 }
-
-
 
 h1 {
     text-align: center;
     color: #333;
     margin-bottom: 1.5rem;
+    width: 100%; /* Ensure full width */
 }
 
 @media (max-width: 768px) {
