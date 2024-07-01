@@ -25,32 +25,25 @@ public class ImageFinder extends HttpServlet {
 
     @Override
     protected final void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ImageScrapper.reset();  // Reset the scrapper state for the new request
+
         resp.setContentType("application/json");
         String path = req.getServletPath();
         String url = req.getParameter("url");
-        
+
         if (url != null && !url.isEmpty()) {
             try {
-				
-                // Instantiate a new ImageScrapper for each request
                 ImageScrapper imageScrapper = new ImageScrapper(url, 0);
-
-                // Wait for the scraping to complete
                 imageScrapper.getThread().join();
 
                 System.out.println("Got request of: " + path + " with query param: " + url);
 
-                // Send the scraped image URLs as JSON response
                 resp.getWriter().print(GSON.toJson(ImageScrapper.getData()));
-
-                // Reset the scrapper state for the next request
-                ImageScrapper.reset();
             } catch (Exception e) {
                 e.printStackTrace();
                 resp.getWriter().print(GSON.toJson("Error occurred while processing the request."));
             }
         } else {
-            // If no URL parameter is provided, return the test images
             resp.getWriter().print(GSON.toJson(testImages));
         }
     }

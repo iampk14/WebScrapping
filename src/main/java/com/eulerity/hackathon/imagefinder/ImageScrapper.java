@@ -20,11 +20,12 @@ public class ImageScrapper implements Runnable {
     private static List<String> imageUrls = Collections.synchronizedList(new ArrayList<>());
     private static Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
     private static final int MAX_DEPTH = 2;
-    private static final int MAX_LINKS = 50;
+    private static final int MAX_LINKS = 100;
     private static volatile int validLinkCount = 0;
     private String domain;
     private int depth;
     private Thread thread;
+    private static List<Thread> runningThreads = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void run() {
@@ -37,6 +38,7 @@ public class ImageScrapper implements Runnable {
         this.domain = getDomainName(URL);
         if (depth <= MAX_DEPTH) {
             this.thread = new Thread(this);
+            runningThreads.add(this.thread);
             this.thread.start();
         }
     }
@@ -52,7 +54,6 @@ public class ImageScrapper implements Runnable {
         visitedUrls.add(URL);
 
         try {
-            // Fetch the HTML document
             Document doc = Jsoup.connect(URL)
                     .ignoreContentType(true)
                     .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
@@ -61,10 +62,8 @@ public class ImageScrapper implements Runnable {
                     .followRedirects(true)
                     .get();
 
-            // Extract all image elements
             getImages(doc);
 
-            // Find links to other pages and recursively scrape them
             if (depth < MAX_DEPTH && validLinkCount < MAX_LINKS) {
                 Elements links = doc.select("a[href]");
                 List<Thread> threads = new ArrayList<>();
@@ -82,27 +81,22 @@ public class ImageScrapper implements Runnable {
                         thread.start();
                     }
                 }
-                // Wait for all threads to complete
                 for (Thread thread : threads) {
                     thread.join();
                 }
             }
 
         } catch (HttpStatusException e) {
-            // Handle specific HTTP status errors
             System.err.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
         } catch (IOException e) {
-            // Handle any IOException that occurs during Jsoup connection
             System.out.println("IOException occurred: " + e.getMessage());
         } catch (Exception e) {
-            // Handle any other exceptions
             System.out.println("Exception has occurred: " + e.getMessage());
         }
     }
 
     private void getImages(Document doc) {
         Elements images = doc.select("img");
-        // Iterate over the image elements and extract src attribute
         for (Element image : images) {
             String imageUrl = image.absUrl("src");
             if (isValidUrl(imageUrl) && !imageUrls.contains(imageUrl) && domain.equals(getDomainName(imageUrl))) {
@@ -135,10 +129,15 @@ public class ImageScrapper implements Runnable {
         return new ArrayList<>(imageUrls);
     }
 
-    public static boolean reset() {
+    public static void reset() {
+        for (Thread thread : runningThreads) {
+            if (thread.isAlive()) {
+                thread.interrupt();
+            }
+        }
+        runningThreads.clear();
         imageUrls.clear();
         visitedUrls.clear();
         validLinkCount = 0;
-        return true;
     }
 }
